@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -14,25 +15,27 @@ public abstract class Goose : MonoBehaviour
     [field: SerializeField] public int Cost { get; private set; }
 
     protected GooseMover GooseMover;
-    protected DetectorBush DetectorBush;
+    //protected DetectorBush DetectorBush;
     protected Health Health;
     protected PauseBeforeTransition PauseBeforeTransition;
 
     private Coroutine _coroutine;
     private WaitForSecondsRealtime _wait;
     private int _health;
-    private float _startPause;
     private float _startSpeed;
     private Vector3 _startSize;
     private IPoolAdder<Goose> _poolAdder;
-    private GeeseNavigator _geeseNavigator;
+    private IMovable _movable;
+    private bool _startStatusSize;
+
+    //public event Action<Goose> ReadedToMove;
 
     public Transform TargetMovement { get; private set; }
     public bool IsSmall { get; private set; }
 
     protected virtual void Awake()
     {
-        DetectorBush = GetComponent<DetectorBush>();
+        //DetectorBush = GetComponent<DetectorBush>();
         GooseMover = GetComponent<GooseMover>();
 
         Health = new Health();
@@ -41,7 +44,6 @@ public abstract class Goose : MonoBehaviour
         PauseBeforeTransition = new PauseBeforeTransition();
         PauseBeforeTransition.SetLongPause();
         _wait = new WaitForSecondsRealtime(PauseBeforeTransition.Value);
-        _startPause = PauseBeforeTransition.Value;
     }
 
     private void OnEnable()
@@ -59,19 +61,12 @@ public abstract class Goose : MonoBehaviour
     public void Init(IPoolAdder<Goose> poolAdder) =>
         _poolAdder = poolAdder;
 
-    public void SetNavigator(GeeseNavigator geeseNavigator)
-    {
-        _geeseNavigator = geeseNavigator;
-        _geeseNavigator.OnAssignTarget(this);
-        _geeseNavigator.AddGoose(this);
-    }
-
     public void ResetParameters()
     {
         Health.RestartHealth(_health);
         GooseMover.ResetSpeed(_startSpeed);
         transform.localScale = _startSize;
-        IsSmall = false;
+        IsSmall = _startStatusSize;
         TargetBush = null;
     }
 
@@ -123,7 +118,6 @@ public abstract class Goose : MonoBehaviour
     {
         //_effectDie.Play();
         _poolAdder.AddToPool(this);
-        _geeseNavigator.RemoveGoose(this);
     }
 
     protected void SetStartParameters()
@@ -131,12 +125,19 @@ public abstract class Goose : MonoBehaviour
         _startSize = transform.localScale;
         _health = Health.Value;
         _startSpeed = GooseMover.CurrentSpeed;
+        _startStatusSize = IsSmall;
     }
 
     private void WaitInBush()
     {
+        StopWait();
         TargetMovement = null;
         _coroutine = StartCoroutine(StartWait());
+    }
+
+    public void SetNewTarget(IMovable movable)
+    {
+        _movable = movable;
     }
 
     private IEnumerator StartWait()
@@ -145,6 +146,6 @@ public abstract class Goose : MonoBehaviour
 
         yield return _wait;
 
-        _geeseNavigator.OnAssignTarget(this);
+        _movable.AssignTargetMovement(this);
     }
 }

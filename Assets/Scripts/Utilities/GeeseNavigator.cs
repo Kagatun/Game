@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GeeseNavigator : MonoBehaviour
+public class GeeseNavigator : MonoBehaviour, IMovable
 {
     [SerializeField] private DispatcherSpawnersBushes _dispatcherSpawnersBushes;
+    [SerializeField] private DispatcherSpawnersGeese _dispatcherSpawnersGeese;
     [SerializeField] private Transform _target;
 
     private List<Bush> _bushes = new List<Bush>();
@@ -15,6 +16,7 @@ public class GeeseNavigator : MonoBehaviour
     private void OnEnable()
     {
         _dispatcherSpawnersBushes.Spawned += AddListBushes;
+        _dispatcherSpawnersGeese.Spawned += AddListGeese;
     }
 
     private void OnDisable()
@@ -23,13 +25,12 @@ public class GeeseNavigator : MonoBehaviour
 
         foreach (var bush in _bushes)
             bush.LevelChangedDown -= SetBushReassignment;
+
+        _dispatcherSpawnersGeese.Spawned -= AddListGeese;
+
+        //foreach (var goose in _geese)
+        //    goose.ReadedToMove -= OnAssignTarget;
     }
-
-    public void AddGoose(Goose goose) =>
-        _geese.Add(goose);
-
-    public void RemoveGoose(Goose goose) =>
-        _geese.Remove(goose);
 
     public void OnAssignTarget(Goose goose)
     {
@@ -39,6 +40,8 @@ public class GeeseNavigator : MonoBehaviour
         if (goose is IRunPast)
         {
             goose.SetTargetMovement(_target.transform);
+
+            print("Бегу сразу к цели");
             return;
         }
 
@@ -50,6 +53,8 @@ public class GeeseNavigator : MonoBehaviour
         {
             goose.SetBush(null);
             goose.SetTargetMovement(_target);
+            print("Не нужен ближайший куст иду к цели");
+
             return;
         }
 
@@ -61,11 +66,16 @@ public class GeeseNavigator : MonoBehaviour
             {
                 goose.SetBush(closestBush);
                 goose.SetTargetMovement(closestBush.transform);
+
+                print("нашел ближайший куст");
+                return;
             }
             else
             {
                 goose.SetBush(null);
                 goose.SetTargetMovement(_target);
+                print("Не нашел ближайший куст");
+                return;
             }
         }
     }
@@ -82,12 +92,12 @@ public class GeeseNavigator : MonoBehaviour
                 }
             }
         }
-
     }
 
     private Bush FindClosestBush(Goose goose)
     {
         List<Bush> bushes = _bushes;
+        int minCount = 2;
 
         if (goose.TargetBush != null)
             bushes.Remove(goose.TargetBush);
@@ -100,7 +110,7 @@ public class GeeseNavigator : MonoBehaviour
         var closestBushes = suitableBushesByLevel
             .Where(bush => (bush.transform.position - _target.position).sqrMagnitude < sqrDistanceGooseToTarget)
             .OrderBy(bush => (goose.transform.position - bush.transform.position).sqrMagnitude)
-            .Take(2).ToList();
+            .Take(minCount).ToList();
 
         if (closestBushes.Count == 0)
             return null;
@@ -117,5 +127,17 @@ public class GeeseNavigator : MonoBehaviour
 
         foreach (var bush in _bushes)
             bush.LevelChangedDown += SetBushReassignment;
+    }
+
+    private void AddListGeese(Goose goose)
+    {
+        _geese.Add(goose);
+        OnAssignTarget(goose);
+        goose.SetNewTarget(this);
+    }
+
+    public void AssignTargetMovement(Goose goose)
+    {
+        OnAssignTarget(goose);
     }
 }

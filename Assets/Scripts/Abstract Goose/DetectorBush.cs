@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DetectorBush : MonoBehaviour
+public class DetectorBush
 {
     //private List<Bush> _bushes = new List<Bush>();
 

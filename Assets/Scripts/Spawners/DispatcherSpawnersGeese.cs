@@ -18,6 +18,8 @@ public class DispatcherSpawnersGeese : MonoBehaviour
     private float _maxRandomTime = 1.2f;
     private int _currentCountRemoveGeese;
 
+    public event Action <Goose> Spawned;
+
     private void Start()
     {
         _gooseDictionary = new Dictionary<string, SpawnerGeese>();
@@ -68,8 +70,7 @@ public class DispatcherSpawnersGeese : MonoBehaviour
                 Transform spawnPoint = _spawnPoints[randomIndex];
 
                 Goose goose = spawner.SpawnGoose(spawnPoint);
-                goose.SetNavigator(_geeseNavigator);
-
+                Spawned?.Invoke(goose);
                 totalSpawned++;
 
                 if (totalSpawned >= _maxNumberGeese)
@@ -91,7 +92,7 @@ public class DispatcherSpawnersGeese : MonoBehaviour
                 Transform spawnPoint = _spawnPoints[randomIndex];
 
                 Goose goose = spawner.SpawnGoose(spawnPoint);
-                goose.SetNavigator(_geeseNavigator);
+                Spawned?.Invoke(goose);
 
                 allGeeseToSpawn.Add(goose);
 

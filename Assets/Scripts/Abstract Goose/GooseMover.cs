@@ -6,8 +6,9 @@ public class GooseMover : MonoBehaviour
 {
     [SerializeField] private AnimationsGoose _animationsGoose;
 
-    private Transform _targetTransform;
+    [SerializeField] private Transform _targetTransform;
     private Coroutine _coroutine;
+    private float _startSpeed;
 
     public event Action TargetReached;
 
@@ -41,20 +42,29 @@ public class GooseMover : MonoBehaviour
         }
         else
         {
-            print("вызвалось событие из мувера");
+            //print("вызвалось событие из мувера");
             TargetReached?.Invoke();
             _targetTransform = null;
         }
     }
 
-    public void SetSlowSpeed() =>
+    public void SetSlowSpeed()
+    {
         CurrentSpeed = SlowSpeed;
+        _startSpeed = CurrentSpeed;
+    }
 
-    public void SetMediumSpeed() =>
+    public void SetMediumSpeed()
+    {
         CurrentSpeed = MediumSpeed;
+        _startSpeed = CurrentSpeed;
+    }
 
-    public void SetFastSpeed() =>
+    public void SetFastSpeed()
+    {
         CurrentSpeed = FastSpeed;
+        _startSpeed = CurrentSpeed;
+    }
 
     public float ResetSpeed(float startSpeed) =>
         CurrentSpeed = startSpeed;
@@ -74,20 +84,17 @@ public class GooseMover : MonoBehaviour
     private void StopStunCoroutine()
     {
         if (_coroutine != null)
-        {
             StopCoroutine(_coroutine);
-        }
     }
 
     private IEnumerator StartStun(float timeStun)
     {
-        float startSpeed = CurrentSpeed;
         CurrentSpeed = 0;
         _animationsGoose.TriggerStun();
 
         yield return new WaitForSeconds(timeStun);
 
-        CurrentSpeed = startSpeed;
+        CurrentSpeed = _startSpeed;
         _animationsGoose.TriggerRun(CurrentSpeed, SlowSpeed, MediumSpeed, FastSpeed);
     }
 }

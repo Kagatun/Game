@@ -53,9 +53,4 @@ public class AnimationsGoose : MonoBehaviour
     {
         _animator.SetTrigger(AnimationParams.Stun);
     }
-
-    //public void TriggerTakeDamage()
-    //{
-    //    _animator.SetTrigger(AnimationParams.Hit);
-    //}
 }

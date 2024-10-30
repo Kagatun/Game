@@ -2815,6 +2815,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dispatcherSpawnersBushes: {fileID: 1168120324}
+  _dispatcherSpawnersGeese: {fileID: 1451353665}
   _target: {fileID: 403430950}
 --- !u!4 &152073718 stripped
 Transform:
