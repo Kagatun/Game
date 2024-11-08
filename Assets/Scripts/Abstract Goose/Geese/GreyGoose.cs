@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class GreyGoose : Goose
 {
     protected override void Awake()
@@ -5,7 +7,8 @@ public class GreyGoose : Goose
         base.Awake();
 
         PauseBeforeTransition.SetWithoutPause();
-        GooseMover.SetFastSpeed();
+        Wait = new WaitForSeconds(PauseBeforeTransition.Value);
+        GooseMover.SetMediumSpeed();
         Health.SetBigHealth();
 
         SetStartParameters();

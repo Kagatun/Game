@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SamuraiGoose : Goose , IRunPast
+public class SamuraiGoose : Goose
 {
     protected override void Awake()
     {
@@ -10,6 +10,7 @@ public class SamuraiGoose : Goose , IRunPast
 
         GooseMover.SetFastSpeed();
         Health.SetMediumHealth();
+        Navigator.SetStatusPersonRunningPastBushes(false);
 
         SetStartParameters();
     }

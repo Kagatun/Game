@@ -34,6 +34,7 @@ public class ClickDetector : MonoBehaviour
             if (hit.transform.TryGetComponent(out Goose goose))
             {
                 goose.TakeStun(_damage);
+                goose.TakeCleanDamage(_damage);
             }
 
             if (hit.transform.TryGetComponent(out Bush bush))
@@ -52,7 +53,7 @@ public class ClickDetector : MonoBehaviour
         {
             if (hit.transform.TryGetComponent(out Goose goose))
             {
-                goose.TakeDamage(_damage);
+                goose.TakeCleanDamage(_damage);
             }
 
             if (hit.transform.TryGetComponent(out Bush bush))

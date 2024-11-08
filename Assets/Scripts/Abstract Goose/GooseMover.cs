@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class GooseMover : MonoBehaviour
 {
-    [SerializeField] private AnimationsGoose _animationsGoose;
-
-    [SerializeField] private Transform _targetTransform;
+    private Transform _targetTransform;
     private Coroutine _coroutine;
     private float _startSpeed;
+    private float _heightMovement;
 
     public event Action TargetReached;
+    public event Action <bool> Stuned;
 
     public float FastSpeed { get; private set; } = 12f;
     public float MediumSpeed { get; private set; } = 8f;
@@ -20,17 +20,17 @@ public class GooseMover : MonoBehaviour
     private void Update()
     {
         if (_targetTransform != null)
-            GoToTarget(_targetTransform);
+            GoToTarget(_targetTransform, _heightMovement);
     }
 
-    public void GoToTarget(Transform positionTarget)
+    public void GoToTarget(Transform positionTarget, float height)
     {
+        _heightMovement = height;
         _targetTransform = positionTarget;
 
         float minDistanceToTargetSqr = 0.01f;
 
         Vector3 direction = (_targetTransform.position - transform.position);
-        direction.y = 0;
 
         if (direction.sqrMagnitude > minDistanceToTargetSqr)
         {
@@ -38,15 +38,19 @@ public class GooseMover : MonoBehaviour
             transform.forward = direction;
 
             Vector3 newPosition = transform.position + transform.forward * CurrentSpeed * Time.deltaTime;
+            newPosition.y = height;
+
             transform.position = newPosition;
         }
         else
         {
-            //print("вызвалось событие из мувера");
             TargetReached?.Invoke();
             _targetTransform = null;
         }
     }
+
+    public void ResetTargetMovement() =>
+        _targetTransform = null;
 
     public void SetSlowSpeed()
     {
@@ -90,11 +94,11 @@ public class GooseMover : MonoBehaviour
     private IEnumerator StartStun(float timeStun)
     {
         CurrentSpeed = 0;
-        _animationsGoose.TriggerStun();
+        Stuned?.Invoke(true);
 
         yield return new WaitForSeconds(timeStun);
 
         CurrentSpeed = _startSpeed;
-        _animationsGoose.TriggerRun(CurrentSpeed, SlowSpeed, MediumSpeed, FastSpeed);
+        Stuned?.Invoke(false);
     }
 }

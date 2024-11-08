@@ -4,7 +4,6 @@ public class WateringGoose : Goose
     {
         base.Awake();
 
-        PauseBeforeTransition.SetLongPause();
         GooseMover.SetMediumSpeed();
         Health.SetLittleHealth();
 

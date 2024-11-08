@@ -15,12 +15,6 @@ public abstract class SpawnerObjects<T> : MonoBehaviour , IPoolAdder<T> where T 
     protected T Get() =>
         _pool.Get();
 
-    protected void ReleaseToPool(T obj) =>
-        _pool.Release(obj);
-
-    protected void OnRemoveObject(T obj) =>
-        ReleaseToPool(obj);
-
     protected virtual T CreateObject() =>
         Instantiate(_prefab);
 
@@ -34,6 +28,6 @@ public abstract class SpawnerObjects<T> : MonoBehaviour , IPoolAdder<T> where T 
         Destroy(obj.gameObject);
 
     public void AddToPool(T obj) =>
-        OnRemoveObject(obj);
+        _pool.Release(obj);
 }
 

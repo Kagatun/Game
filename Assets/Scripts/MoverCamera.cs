@@ -7,7 +7,7 @@ public class MoverCamera : MonoBehaviour
     private float _cameraSpeed = 100f;
     private float _cameraSpeedMouse = 500f;
     private float _zoomSpeed = 10f;
-    private float _minZoom = 10f;
+    private float _minZoom = 5f;
     private float _maxZoom = 40f;
     private float _minX = -35f;
     private float _maxX = 35f;

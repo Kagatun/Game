@@ -9,6 +9,7 @@ public class MedicGoose : Goose
         base.Awake();
 
         PauseBeforeTransition.SetAveragePause();
+        Wait = new WaitForSeconds(PauseBeforeTransition.Value);
         GooseMover.SetMediumSpeed();
         Health.SetMediumHealth();
 

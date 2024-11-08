@@ -3,17 +3,15 @@ using UnityEngine;
 
 public class Health
 {
-    private int _defaultHealth = 1;
-
     public event Action Hited;
     public event Action Deceased;
 
     public int Value { get; private set; }
     public int MaxValue { get; private set; }
 
-    public Health()
+    public Health(int defaultHealth)
     {
-        MaxValue = _defaultHealth;
+        MaxValue = defaultHealth;
         Value = MaxValue;
     }
 

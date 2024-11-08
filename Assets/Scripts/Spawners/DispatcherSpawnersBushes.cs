@@ -12,15 +12,7 @@ public class DispatcherSpawnersBushes : MonoBehaviour
 
     private List<Bush> _bushes = new List<Bush>();
 
-    public event Action Spawned;
-
     public IReadOnlyList<Bush> Bushes => _bushes.AsReadOnly();
-
-    private void Start()
-    {
-        CreateBushes();
-        Spawned?.Invoke();
-    }
 
     public void CreateBushes()
     {

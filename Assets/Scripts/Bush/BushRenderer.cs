@@ -31,7 +31,7 @@ public class BushRenderer : MonoBehaviour
         materials[0] = _leafMaterials[bush.CurrentLevel];
         _meshRenderer.materials = materials;
 
-        if (bush.CurrentLevel == _maxLevel && bush.AbilityPoints > 0)
+        if (bush.CurrentLevel == _maxLevel && bush.CurrentAbilityPoints > 0)
         {
             materials[1] = _materialFlowers;
         }

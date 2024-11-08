@@ -5,20 +5,25 @@ using UnityEngine;
 
 public class DispatcherSpawnersGeese : MonoBehaviour
 {
-    [SerializeField] private List<SpawnerGeese> _spawnerGeese;
-    [SerializeField] private List<Goose> _geeseTypes;
-    [SerializeField] private int _maxNumberGeese;
-    [SerializeField] private List<int> _spawnCount;
-    [SerializeField] private List<Transform> _spawnPoints;
+    [SerializeField] private DispatcherSpawnersBushes _dispatcherSpawnersBushes;
+    [SerializeField] private SpawnerEffects _spawnerEffects;
+    [SerializeField] private Transform _targetHouse;
     [SerializeField] private Player _player;
-    [SerializeField] private GeeseNavigator _geeseNavigator;
+    [SerializeField] private List<Transform> _spawnPoints;
+    [SerializeField] private List<SpawnerGeese> _spawnerGeese;
+    [SerializeField] private float _minRandomTime = 0.3f;
+    [SerializeField] private float _maxRandomTime = 1.2f;
+    [SerializeField] private List<Goose> _geeseTypes;
+    [SerializeField] private List<int> _spawnCount;
+
+    [field: SerializeField] public int MaxNumberGeese { get; private set; }
 
     private Dictionary<string, SpawnerGeese> _gooseDictionary;
-    private float _minRandomTime = 0.3f;
-    private float _maxRandomTime = 1.2f;
     private int _currentCountRemoveGeese;
+    private int _currentCountSpawnGeese;
 
-    public event Action <Goose> Spawned;
+    public event Action FinishedWave;
+    public event Action —reated;
 
     private void Start()
     {
@@ -26,8 +31,6 @@ public class DispatcherSpawnersGeese : MonoBehaviour
 
         for (int i = 0; i < _spawnerGeese.Count; i++)
             _gooseDictionary.Add(_geeseTypes[i].GetType().Name, _spawnerGeese[i]);
-
-        StartCoroutine(StartSpawnGeese());
     }
 
     private void OnEnable()
@@ -42,7 +45,7 @@ public class DispatcherSpawnersGeese : MonoBehaviour
             spawner.GooseRemoved -= AddCount;
     }
 
-    private IEnumerator StartSpawnGeese()
+    public IEnumerator StartSpawnGeese()
     {
         int totalSpawned = 0;
         List<Goose> allGeeseToSpawn = new List<Goose>();
@@ -52,7 +55,7 @@ public class DispatcherSpawnersGeese : MonoBehaviour
             string gooseTypeName = _geeseTypes[i].GetType().Name;
             int countToSpawn = _spawnCount[i];
 
-            countToSpawn = Mathf.Min(countToSpawn, _maxNumberGeese);
+            countToSpawn = Mathf.Min(countToSpawn, MaxNumberGeese);
 
             for (int j = 0; j < countToSpawn; j++)
                 allGeeseToSpawn.Add(_geeseTypes[i]);
@@ -69,20 +72,25 @@ public class DispatcherSpawnersGeese : MonoBehaviour
                 int randomIndex = UnityEngine.Random.Range(0, _spawnPoints.Count);
                 Transform spawnPoint = _spawnPoints[randomIndex];
 
+                spawner.SetListBushes(_dispatcherSpawnersBushes.Bushes);
+                spawner.SetTargetHouse(_targetHouse);
                 Goose goose = spawner.SpawnGoose(spawnPoint);
-                Spawned?.Invoke(goose);
+                goose.Navigator.OnAssignTarget();
+                _spawnerEffects.AddGooseList(goose);
+
+                _currentCountSpawnGeese++;
                 totalSpawned++;
 
-                if (totalSpawned >= _maxNumberGeese)
+                if (totalSpawned >= MaxNumberGeese)
                     yield break;
 
                 float randomTimeGeneration = UnityEngine.Random.Range(_minRandomTime, _maxRandomTime);
 
-                yield return new WaitForSecondsRealtime(randomTimeGeneration);
+                yield return new WaitForSeconds(randomTimeGeneration);
             }
         }
 
-        int remainingToSpawn = _maxNumberGeese - totalSpawned;
+        int remainingToSpawn = MaxNumberGeese - totalSpawned;
 
         for (int i = 0; i < remainingToSpawn; i++)
         {
@@ -91,16 +99,23 @@ public class DispatcherSpawnersGeese : MonoBehaviour
                 int randomIndex = UnityEngine.Random.Range(0, _spawnPoints.Count);
                 Transform spawnPoint = _spawnPoints[randomIndex];
 
+                spawner.SetListBushes(_dispatcherSpawnersBushes.Bushes);
+                spawner.SetTargetHouse(_targetHouse);
                 Goose goose = spawner.SpawnGoose(spawnPoint);
-                Spawned?.Invoke(goose);
+                goose.Navigator.OnAssignTarget();
+                _spawnerEffects.AddGooseList(goose);
 
+                _currentCountSpawnGeese++;
                 allGeeseToSpawn.Add(goose);
 
                 float randomTimeGeneration = UnityEngine.Random.Range(_minRandomTime, _maxRandomTime);
 
-                yield return new WaitForSecondsRealtime(randomTimeGeneration);
+                yield return new WaitForSeconds(randomTimeGeneration);
             }
         }
+
+        if(_currentCountSpawnGeese == MaxNumberGeese)
+            —reated?.Invoke();
     }
 
     private void ShuffleList(List<Goose> geese)
@@ -114,12 +129,12 @@ public class DispatcherSpawnersGeese : MonoBehaviour
         }
     }
 
-    private void AddCount(int cost)
+    private void AddCount(int costGoose)
     {
         _currentCountRemoveGeese++;
-        _player.AddMoney(cost);
+        _player.AddMoney(costGoose);
 
-        if (_currentCountRemoveGeese == _maxNumberGeese)
-            Debug.Log("œÓ·Â‰‡");
+        if (_currentCountRemoveGeese == MaxNumberGeese)
+            FinishedWave?.Invoke();
     }
 }

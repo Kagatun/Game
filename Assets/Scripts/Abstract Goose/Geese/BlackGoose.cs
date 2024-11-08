@@ -9,6 +9,7 @@ public class BlackGoose : Goose
         base.Awake();
 
         PauseBeforeTransition.SetSmallPause();
+        Wait = new WaitForSeconds(PauseBeforeTransition.Value);
         GooseMover.SetMediumSpeed();
         Health.SetMediumHealth();
 

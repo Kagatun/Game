@@ -15,6 +15,11 @@ public class AnimationsGoose : MonoBehaviour
         public static readonly int Run3 = Animator.StringToHash("Run3");
         public static readonly int Run4 = Animator.StringToHash("Run4");
         public static readonly int Stun = Animator.StringToHash("Stun");
+        public static readonly int Swim = Animator.StringToHash("Swim");
+        public static readonly int Swim2 = Animator.StringToHash("Swim2");
+        public static readonly int Swim3 = Animator.StringToHash("Swim3");
+        public static readonly int StunOnWater = Animator.StringToHash("StunSwim");
+
     }
 
     [SerializeField] private Animator _animator;
@@ -49,8 +54,36 @@ public class AnimationsGoose : MonoBehaviour
         }
     }
 
-    public void TriggerStun()
+    public void TriggerSwim(float currentSpeed, float speedSlow, float SpeedMedium, float SpeedFast)
     {
-        _animator.SetTrigger(AnimationParams.Stun);
+        if (currentSpeed == speedSlow)
+        {
+            _animator.SetTrigger(AnimationParams.Swim);
+        }
+        else if (currentSpeed == SpeedMedium)
+        {
+            _animator.SetTrigger(AnimationParams.Swim2);
+        }
+        else if (currentSpeed == SpeedFast)
+        {
+            _animator.SetTrigger(AnimationParams.Swim3);
+        }
+    }
+
+    public void TriggerFly()
+    {
+        _animator.SetTrigger(AnimationParams.Fly);
+    }
+
+    public void TriggerStun(bool isSwim)
+    {
+        if(isSwim)
+        {
+            _animator.SetTrigger(AnimationParams.StunOnWater);
+        }
+        else
+        {
+            _animator.SetTrigger(AnimationParams.Stun);
+        }   
     }
 }

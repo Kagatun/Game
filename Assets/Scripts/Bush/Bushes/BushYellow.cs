@@ -13,7 +13,7 @@ public class BushYellow : Bush
  
     protected override void Ability(Goose goose)
     {
-        goose.SetSmallerSize(); //уменьшает гуся в размере
+        goose.ReduceSizeByHalf(); //уменьшает гуся в размере
         goose.SetLittleHealth();//делает здоровье 1
     }
 }
